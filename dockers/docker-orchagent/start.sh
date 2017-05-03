@@ -65,6 +65,10 @@ elif [ "$HWSKU" == "AS7512" ]; then
     ORCHAGENT_ARGS+="-m $MAC_ADDRESS"
 elif [ "$HWSKU" == "INGRASYS-S9100-C32" ]; then
     ORCHAGENT_ARGS+="-m $MAC_ADDRESS"
+elif [ "$HWSKU" == "INGRASYS-S8900-54XC" ]; then
+    ORCHAGENT_ARGS+="-m $MAC_ADDRESS"
+elif [ "$HWSKU" == "INGRASYS-S8900-64XC" ]; then
+    ORCHAGENT_ARGS+="-m $MAC_ADDRESS"
 elif [ "$HWSKU" == "ACS-MSN2700" ]; then
     SWSSCONFIG_ARGS+="msn2700.32ports.buffers.json msn2700.32ports.qos.json "
 fi
