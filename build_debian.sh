@@ -116,11 +116,8 @@ sudo dpkg --root=$FILESYSTEM_ROOT -i target/debs/linux-image-3.16.0-4-amd64_*.de
 ## Update initramfs for booting with squashfs+aufs
 cat files/initramfs-tools/modules | sudo tee -a $FILESYSTEM_ROOT/etc/initramfs-tools/modules > /dev/null
 
-IMAGE_VERSION=$(. functions.sh && sonic_get_version)
-
 ## Hook into initramfs: change fs type from vfat to ext4 on arista switches
 sudo mkdir -p $FILESYSTEM_ROOT/etc/initramfs-tools/scripts/init-premount/
-sed -i -e "s/%%IMAGE_VERSION%%/$IMAGE_VERSION/g" files/initramfs-tools/arista-convertfs
 sudo cp files/initramfs-tools/arista-convertfs $FILESYSTEM_ROOT/etc/initramfs-tools/scripts/init-premount/arista-convertfs
 sudo chmod +x $FILESYSTEM_ROOT/etc/initramfs-tools/scripts/init-premount/arista-convertfs
 sudo cp files/initramfs-tools/mke2fs $FILESYSTEM_ROOT/etc/initramfs-tools/hooks/mke2fs
@@ -199,6 +196,7 @@ sudo LANG=C DEBIAN_FRONTEND=noninteractive chroot $FILESYSTEM_ROOT apt-get -y in
     logrotate               \
     curl                    \
     kexec-tools             \
+    less                    \
     unzip
 
 ## Disable kexec supported reboot which was installed by default
@@ -216,6 +214,9 @@ sudo mkdir -p $FILESYSTEM_ROOT/var/core
 sudo augtool --autosave "
 set /files/etc/sysctl.conf/kernel.core_pattern '|/usr/bin/coredump-compress %e %p'
 
+set /files/etc/sysctl.conf/kernel.softlockup_panic 1
+set /files/etc/sysctl.conf/kernel.panic 10
+
 set /files/etc/sysctl.conf/net.ipv4.conf.default.forwarding 1
 set /files/etc/sysctl.conf/net.ipv4.conf.all.forwarding 1
 set /files/etc/sysctl.conf/net.ipv4.conf.eth0.forwarding 0
@@ -231,12 +232,16 @@ set /files/etc/sysctl.conf/net.ipv4.conf.all.arp_filter 0
 set /files/etc/sysctl.conf/net.ipv4.conf.all.arp_notify 1
 set /files/etc/sysctl.conf/net.ipv4.conf.all.arp_ignore 2
 
+set /files/etc/sysctl.conf/net.ipv4.neigh.default.base_reachable_time_ms 1800000
+
 set /files/etc/sysctl.conf/net.ipv6.conf.default.forwarding 1
 set /files/etc/sysctl.conf/net.ipv6.conf.all.forwarding 1
 set /files/etc/sysctl.conf/net.ipv6.conf.eth0.forwarding 0
 
 set /files/etc/sysctl.conf/net.ipv6.conf.default.accept_dad 0
 set /files/etc/sysctl.conf/net.ipv6.conf.all.accept_dad 0
+
+set /files/etc/sysctl.conf/net.ipv6.conf.eth0.accept_ra_defrtr 0
 " -r $FILESYSTEM_ROOT
 
 ## docker-py is needed by Ansible docker module
