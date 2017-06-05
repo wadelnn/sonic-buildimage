@@ -44,7 +44,10 @@ parse_environment_config() {
 clean_flash() {
     ## Remove all the other unnecssary files except swi file, boot-config
     for f in $(ls -A $target_path); do
-        if [ $f != "${swipath##*/}" ] && [ $f != "boot-config" ]; then
+        if [ $f != "${swipath##*/}" ] &&
+           [ $f != "boot-config" ] &&
+           [ $f != "minigraph.xml" ]
+        then
             rm -rf "$target_path/$f"
         fi
     done
@@ -67,8 +70,12 @@ extract_image() {
     if [ -n "$sonic_upgrade" ] || [ "$rootfs_type" != "vfat" ]; then
         mkdir -p "$image_path/{{ DOCKERFS_DIR }}"
 
+        if [ -n "$sonic_upgrade" ]; then
+            TAR_EXTRA_OPTION="--numeric-owner"
+        fi
+
         ## extract docker archive
-        tar xf "$image_path/{{ FILESYSTEM_DOCKERFS }}" -C "$image_path/{{ DOCKERFS_DIR }}"
+        tar xf "$image_path/{{ FILESYSTEM_DOCKERFS }}" -C "$image_path/{{ DOCKERFS_DIR }}" $TAR_EXTRA_OPTION
 
         ## clean up docker archive
         rm -f "$image_path/{{ FILESYSTEM_DOCKERFS }}"
@@ -100,6 +107,10 @@ EOF
 platform_specific() {
     local platform="$(grep -Eo 'platform=[^ ]+' /etc/cmdline | cut -f2 -d=)"
     local sid="$(grep -Eo 'sid=[^ ]+' /etc/cmdline | cut -f2 -d=)"
+
+    # set varlog size to 100MB
+    echo "varlog_size=100" >>/tmp/append
+
     # This is temporary as the platform= and sid= parameters don't provide enough
     # information to identify the SKU
     # An initramfs hook or a later processing done by the initscripts will be
@@ -107,8 +118,6 @@ platform_specific() {
     if [ "$platform" = "raven" ]; then
         aboot_machine=arista_7050_qx32
         echo "modprobe.blacklist=radeon" >>/tmp/append
-        # set varlog size to 100MB
-        echo "varlog_size=100" >>/tmp/append
     fi
     if [ "$platform" = "crow" ]; then
         aboot_machine=arista_7050_qx32s

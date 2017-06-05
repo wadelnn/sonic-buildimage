@@ -3,7 +3,7 @@ include $(PLATFORM_PATH)/sai.mk
 include $(PLATFORM_PATH)/platform-modules-s6000.mk
 include $(PLATFORM_PATH)/platform-modules-dell.mk
 include $(PLATFORM_PATH)/platform-modules-arista.mk
-include $(PLATFORM_PATH)/platform-modules-ingrasys-s9100.mk
+include $(PLATFORM_PATH)/platform-modules-ingrasys.mk
 include $(PLATFORM_PATH)/docker-orchagent-brcm.mk
 include $(PLATFORM_PATH)/docker-syncd-brcm.mk
 include $(PLATFORM_PATH)/docker-syncd-brcm-rpc.mk
@@ -11,17 +11,19 @@ include $(PLATFORM_PATH)/one-image.mk
 include $(PLATFORM_PATH)/one-aboot.mk
 include $(PLATFORM_PATH)/libsaithrift-dev.mk
 include $(PLATFORM_PATH)/python-saithrift.mk
+include $(PLATFORM_PATH)/docker-ptf-brcm.mk
 
 BCMCMD = bcmcmd
-$(BCMCMD)_URL = "https://sonicstorage.blob.core.windows.net/packages/bcmcmd?sv=2015-04-05&sr=b&sig=X3bFApmsNFmcnWM9mSGRxBugPcg%2FgJCHh5hhSuV1M2c%3D&se=2030-08-23T14%3A41%3A56Z&sp=r"
+$(BCMCMD)_URL = "https://sonicstorage.blob.core.windows.net/packages/20170518/bcmcmd?sv=2015-04-05&sr=b&sig=OCW4mfmbQ6D0BH8nllpAWrS8XL9uczrw32w3XgL4jws%3D&se=2030-03-31T23%3A06%3A15Z&sp=r"
 
 DSSERVE = dsserve
-$(DSSERVE)_URL = "https://sonicstorage.blob.core.windows.net/packages/dsserve?sv=2015-04-05&sr=b&sig=aMlnRA%2FXZNmHPgmOj%2FNMJMYLWyvva1QrN4HcsVXvqKA%3D&se=2030-08-23T14%3A42%3A32Z&sp=r"
+$(DSSERVE)_URL = "https://sonicstorage.blob.core.windows.net/packages/20170518/dsserve?sv=2015-04-05&sr=b&sig=gyNbgSL%2FvpMXDdpboVkIJcTKMRdGgEaOR9OukHhEsu8%3D&se=2030-03-31T23%3A06%3A35Z&sp=r"
 
 SONIC_ONLINE_FILES += $(BCMCMD) $(DSSERVE)
 
 SONIC_ALL += $(SONIC_ONE_IMAGE) $(SONIC_ONE_ABOOT_IMAGE) \
              $(DOCKER_FPM) \
+             $(DOCKER_PTF_BRCM) \
              $(DOCKER_SYNCD_BRCM_RPC)
 
 # Inject brcm sai into sairedis

@@ -41,8 +41,14 @@ RUN sed --in-place 's/httpredir.debian.org/debian-archive.trafficmanager.net/' /
         cmake               \
         libqt5core5a        \
         libqt5network5      \
-        iputils-ping
+        less                \
+        ipython             \
+        git                 \
+        iputils-ping        \
+        hping3
 
+## Reinstall scapy by version from p4lang
+RUN git clone https://github.com/p4lang/scapy-vxlan.git && cd scapy-vxlan && python setup.py install
 
 RUN dpkg -i \
 {% for deb in docker_ptf_debs.split(' ') -%}
@@ -70,6 +76,8 @@ RUN rm -rf /debs \
     && pip install dpkt    \
     && pip install ipaddress \
     && pip install pysubnettree \
+    && pip install paramiko \
+    && pip install parallel-ssh \
     && mkdir -p /opt       \
     && cd /opt             \
     && wget https://raw.githubusercontent.com/p4lang/ptf/master/ptf_nn/ptf_nn_agent.py
